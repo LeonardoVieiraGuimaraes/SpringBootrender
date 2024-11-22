@@ -1,16 +1,29 @@
 FROM ubuntu:latest AS build
 
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
+# Atualize o repositório e instale o OpenJDK 17 e Maven
+RUN apt-get update && \
+    apt-get install -y openjdk-17-jdk maven
+
+# Defina o diretório de trabalho
+WORKDIR /app
+
+# Copie o código-fonte para o contêiner
 COPY . .
 
-RUN apt-get install maven -y
-RUN mvn clean install 
+# Compile o projeto
+RUN mvn clean install
 
+# Use a imagem oficial do OpenJDK 17 para rodar a aplicação
 FROM openjdk:17-jdk-slim
 
+# Defina o diretório de trabalho
+WORKDIR /app
+
+# Copie o arquivo JAR gerado para o contêiner
+COPY --from=build /app/target/*.jar app.jar
+
+# Exponha a porta que a aplicação irá rodar
 EXPOSE 8080
 
-COPY --from=build /target/deploy_render-1.0.0.jar app.jar
-
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+# Comando para iniciar a aplicação
+ENTRYPOINT ["java", "-jar", "app.jar"]
