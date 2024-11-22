@@ -1,5 +1,5 @@
 FROM ubuntu:latest AS build
-
+LABEL authors="Leonardo Vieira Guimaraes"
 # Atualize o repositório e instale o OpenJDK 17 e Maven
 RUN apt-get update && \
     apt-get install -y openjdk-17-jdk maven
